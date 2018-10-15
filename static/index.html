@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Load Test</title>
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="jumbotron mt-3">
+            <h1>API Example</h1>
+            <p class="lead">This example is showing how data is loaded from the diferent instances of the json api</p>
+            <hr>
+            <div class="row">
+                <div class="col"><b>PHP Version</b></div>
+                <div class="col phpversion"></div>
+            </div>
+            <div class="row">
+                <div class="col"><b>Instance Index</b></div>
+                <div class="col instance-index"></div>
+            </div>
+            <div class="row">
+                <div class="col"><b>Instance GUID</b></div>
+                <div class="col instance-guid"></div>
+            </div>
+            <div class="row">
+                <div class="col"><b>Request Time</b></div>
+                <div class="col time"></div>
+            </div>
+        </div>
+
+        <h2>History</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>PHP Version</th>
+                    <th>Instance Index</th>
+                    <th>Request Time</th>
+                </tr>
+            </thead>
+            <tbody class="history-row">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        var run = function() { 
+            var startTime = performance.now();
+            var request = $.ajax({
+                url: "https://anx-hn-php-demo.cfapps.io/",
+                method: "GET",
+                dataType: "json"
+            });
+
+            request.done(function (data) {
+                var timeRequired = Math.round((performance.now() - startTime) / 100) / 10 + 's';
+
+                $(".instance-index").html(data.instance_index);
+                $(".instance-guid").html(data.instance_guid);
+                $(".phpversion").html(data.phpversion);
+                $(".time").html(timeRequired);
+
+                $(".history-row").prepend(
+                    $('<tr>')
+                        .append($('<td>').text(data.phpversion))
+                        .append($('<td>').text(data.instance_index))
+                        .append($('<td>').text(timeRequired))
+                );
+
+                window.setTimeout(run, 1000);
+            });
+
+            request.fail(function (jqXHR, textStatus) {
+                console.log("Request failed: " + textStatus);
+                window.setTimeout(run, 1000);
+
+                $(".history-row").prepend(
+                    $('<tr>')
+                        .append($('<td colspan="4">').text("Request failed!"))
+                );
+            });
+        }
+
+        run();
+    </script>
+</body>
+
+</html>

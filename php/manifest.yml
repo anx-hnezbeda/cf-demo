@@ -1,0 +1,7 @@
+---
+applications:
+  - name: anx-hn-php-demo
+    buildpack: php_buildpack
+    memory: 128M
+    disk_quota: 256M
+
